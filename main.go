@@ -22,6 +22,8 @@ var todos = []Todo{
 	{ID: 2, Task: "Build a simple API", Done: false},
 }
 
+var nextID = 3
+
 func ListHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	err := json.NewEncoder(w).Encode(todos)
@@ -64,23 +66,16 @@ func CreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if data.Task == ""{
+	if data.Task == "" {
 		http.Error(w, "Task is empty", http.StatusBadRequest)
 		return
 	}
-
-	var maxID int
-	for _, todo := range todos {
-		if maxID < todo.ID {
-			maxID = todo.ID
-		}
-	}
-
 	newTask := Todo{
-		ID:   maxID + 1,
+		ID:   nextID,
 		Task: data.Task,
 		Done: data.Done,
 	}
+	nextID++
 
 	log.Printf("Added new task %d: %s", newTask.ID, newTask.Task)
 
